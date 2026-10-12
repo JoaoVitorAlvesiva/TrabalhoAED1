@@ -7,6 +7,7 @@ public class TADCandidato {
 	private class Candidato {
 		private int id;
 		String nome;
+		String estado;
 		SexoCandidato sexo;
 		SexoCandidato sexoPotencialC;
 		Candidato prox;
@@ -19,7 +20,7 @@ public class TADCandidato {
 			this.nome = nome;
 			this.sexo = sexo;
 			this.sexoPotencialC = sexoPotencialC;
-			listaIds = new TADListaIdentificadores<Candidato>();
+			listaIds = new TADListaIdentificadores<Celula>();
 		}
 
 		public int getId() {
@@ -50,5 +51,14 @@ public class TADCandidato {
 		if(verificaPotencialCompanheiro(c)) {
 			listaIds.add(c.getId());
 		}
+	}
+	
+	public boolean reside(Candidato u, String sigla) {
+		if(u != null && u.estado != null && sigla != null && sigla.length() >= 2) {
+			if(u.estado.trim().equalsIgnoreCase(sigla)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

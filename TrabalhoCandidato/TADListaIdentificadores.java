@@ -1,28 +1,51 @@
 package TrabalhoCandidato;
 
-public class TADListaIdentificadores<Candidato> {
-	private Candidato head;
-	private Candidato tail;
+public class TADListaIdentificadores {
+	private Celula head;
+	private Celula tail;
 	
-	public class Candidato {
+	public class Celula {
 		int id;
-		Candidato prox;
+		Celula prox;
 		
-		public Candidato(int id) {
+		public Celula(int id) {
 			this.id = id;
+			this.prox = null;
+			
+			
+		}
+		
+		public int getId() {
+			return id;
 		}
 	}
+	
 
-	public TADListaIdentificadores(Candidato head) {
-		head = new Candidato(-1);
-		tail = head;
+	public TADListaIdentificadores() {
+		this.head = new Celula(-1);
+		this.tail = head;
 	}
 	
 	public void add(int id) {
 		if(id >= 0) {
-			tail.prox = new Candidato(id);
+			tail.prox = new Celula(id);
 			tail = tail.prox;
 		}
 	}
+	
+	public int getTamanho() {
+		int contador = 0;
+		Celula aux = this.head.prox;
+		while(aux != null) {
+			contador++;
+			aux = aux.prox;
+		}
+		return contador;
+	}
+	
+	public Celula getPrimeiro() {
+		return this.head.prox;
+	}
+	
 	
 }
