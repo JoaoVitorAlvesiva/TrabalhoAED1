@@ -1,9 +1,15 @@
 package TrabalhoCandidato;
 
+import java.security.InvalidAlgorithmParameterException;
+
 public class TADCandidato {
 	private Candidato head;
 	private Candidato tail;
-	
+
+	private static int proximoId = 0;
+
+	private int grauInteresseDesejado;
+
 	private class Candidato {
 		private int id;
 		String nome;
@@ -12,53 +18,158 @@ public class TADCandidato {
 		SexoCandidato sexoPotencialC;
 		Candidato prox;
 		TADListaIdentificadores listaIds;
-		
-		private static int geraId = 0;
-		
-		public Candidato(String nome, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
-			this.id = geraId++;
+		TADListaInteresses interesses;
+
+		public Candidato(String nome, String estado, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
+			this.id = proximoId++;
 			this.nome = nome;
+			this.estado = estado;
 			this.sexo = sexo;
 			this.sexoPotencialC = sexoPotencialC;
-			listaIds = new TADListaIdentificadores<Celula>();
+			listaIds = new TADListaIdentificadores();
+			interesses = new TADListaInteresses();
 		}
 
 		public int getId() {
 			return id;
 		}
-		
+
 	}
-	
-	public TADCandidato () {
-		head = new Candidato(null, null, null);
+
+	public TADCandidato() {
+		head = new Candidato(null, null, null, null);
 		tail = head;
 	}
-	
-	public void add(String nome, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
-		if(nome != null && sexo != null && sexoPotencialC != null) {
-			tail.prox = new Candidato(nome, sexo, sexoPotencialC);
+
+	public int add(String nome, String estado, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
+		if (nome != null && !nome.trim().isEmpty() && estado != null && estado.trim().matches("[A-Za-z]{2}")
+				&& sexo != null && sexoPotencialC != null) {
+			tail.prox = new Candidato(nome, estado.trim().toUpperCase(), sexo, sexoPotencialC);
 			tail = tail.prox;
+			
+			return tail.getId();
+		} else {
+			throw new NullPointerException();
 		}
 	}
-	
-	//fazer
-	public boolean verificaPotencialCompanheiro(Candidato c) {
-		return true;
-	}
-	
-	//mexer ainda
-	public void inserePotencialCompanheiro(Candidato c) {
-		if(verificaPotencialCompanheiro(c)) {
-			listaIds.add(c.getId());
+
+	public void inserePotencialCompanheiro(Candidato c1, Candidato c2) {
+
+		if (c1 != null && c2 != null && verificaPotencialCompanheiro(c1, c2) && !c1.listaIds.contem(c2.getId())) {
+
+			c1.listaIds.add(c2.getId());
 		}
 	}
-	
+
+	public int numeroCompanheiros(Candidato c) {
+		if (c != null) {
+			return c.listaIds.getTamanho();
+		} else {
+			throw new NullPointerException();
+		}
+	}
+
+	public boolean temInteresse(Candidato c, int id) {
+		if (c != null && id >= 1) {
+			return c.listaIds.verificarId(id);
+		} else {
+			throw new NullPointerException();
+		}
+	}
+
 	public boolean reside(Candidato u, String sigla) {
-		if(u != null && u.estado != null && sigla != null && sigla.length() >= 2) {
-			if(u.estado.trim().equalsIgnoreCase(sigla)) {
+		if (u != null && u.estado != null && sigla != null && sigla.length() >= 2) {
+			if (u.estado.trim().equalsIgnoreCase(sigla.trim())) {
 				return true;
 			}
 		}
 		return false;
 	}
+
+	public void setGrauInteresseDesejado(int grau) {
+		if (grau >= 0) {
+			this.grauInteresseDesejado = grau;
+		}
+	}
+
+	public int getGrauInteresseDesejado() {
+		return grauInteresseDesejado;
+	}
+
+	private boolean aceitaSexo(SexoCandidato preferencia, SexoCandidato sexoOutro) {
+		return preferencia == SexoCandidato.Indiferente || preferencia == sexoOutro;
+	}
+
+	public boolean verificaPotencialCompanheiro(Candidato c1, Candidato c2) {
+
+		if (c1 == null || c2 == null || c1 == c2) {
+			throw new NullPointerException();
+		}
+
+		if (!reside(c1, c2.estado)) {
+			return false;
+		}
+
+		//verificar isso, pois não sei se para estar na lista de potencial companheiro, precisa
+		//considerar o sexo de interesse dos dois ou somente o do candidato c1 
+		if (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo)) {
+			return false;
+		}
+
+		int grauComum = c1.interesses.somaPesosComuns(c2.interesses);
+
+		return grauComum >= grauInteresseDesejado;
+	}
+
+	private Candidato buscarPorId(int id) {
+		Candidato aux = head.prox;
+
+		while (aux != null) {
+			if (aux.getId() == id) {
+				return aux;
+			}
+
+			aux = aux.prox;
+		}
+
+		return null;
+	}
+
+	public boolean adicionaInteresse(int idCandidato, int area) {
+		Candidato c = buscarPorId(idCandidato);
+
+		if (c == null || area < 1 || area > 8) {
+			return false;
+		}
+
+		if (c.interesses.contem(area)) {
+			return false;
+		}
+
+		c.interesses.add(area);
+		return true;
+	}
+	
+	public boolean possuiAreaInteresse(int idCandidato, int area) {
+	    Candidato c = buscarPorId(idCandidato);
+
+	    return c != null && c.interesses.contem(area);
+	}
+	
+	//alterar depois, criado para fazer testes
+	public void imprimirCandidatos() {
+	    Candidato aux = head.prox;
+
+	    while (aux != null) {
+	        System.out.println(
+	            "ID: " + aux.getId()
+	            + " | Nome: " + aux.nome
+	            + " | Estado: " + aux.estado
+	            + " | Sexo: " + aux.sexo
+	        );
+
+	        aux = aux.prox;
+	    }
+	}
+
 }

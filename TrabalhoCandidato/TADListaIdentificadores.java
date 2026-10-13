@@ -22,16 +22,29 @@ public class TADListaIdentificadores {
 	
 
 	public TADListaIdentificadores() {
-		this.head = new Celula(-1);
+		this.head = new Celula(0);
 		this.tail = head;
 	}
 	
 	public void add(int id) {
-		if(id >= 0) {
+		if(id >= 1 && !contem(id)) {
 			tail.prox = new Celula(id);
 			tail = tail.prox;
 		}
 	}
+	
+	public boolean contem(int id) {
+        Celula aux = head.prox;
+
+        while (aux != null) {
+            if (aux.getId() == id) {
+                return true;
+            }
+            aux = aux.prox;
+        }
+
+        return false;
+    }
 	
 	public int getTamanho() {
 		int contador = 0;
@@ -47,5 +60,17 @@ public class TADListaIdentificadores {
 		return this.head.prox;
 	}
 	
+	public boolean verificarId(int id) {
+		Celula aux = head.prox;
+		
+		while(aux != null) {
+			if(aux.getId() == id) {
+				return true;
+			}
+			aux = aux.prox;
+		}
+		
+		return false;
+	}
 	
 }
