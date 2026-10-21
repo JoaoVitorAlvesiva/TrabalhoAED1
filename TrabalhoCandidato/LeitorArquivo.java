@@ -101,17 +101,14 @@ public class LeitorArquivo {
 			System.out.println("Candidatos carregados com sucesso do arquivo: " + caminhoArquivo);
 
 		} catch (FileNotFoundException e) {
-			// voltar exceção: arquivo não encontrado
-			e.getMessage();
+			throw new ArquivoInvalidoException("arquivo não encontrado");
 
 		} catch (IOException e) {
-			// voltar exceção: erro de leitura do arquivo
-			e.getMessage();
+			throw new ArquivoInvalidoException("erro de leitura do arquivo");
 
 		} catch (IllegalArgumentException | NullPointerException e) {
-			// voltar exceção: número em formato inválido (NumberFormatException) ou
-			// dados inválidos ao cadastrar candidato
 			e.getMessage();
+			throw new ArquivoInvalidoException("número em formato inválido (NumberFormatException) ou dados inválidos ao cadastrar candidato");
 		}
 	}
 

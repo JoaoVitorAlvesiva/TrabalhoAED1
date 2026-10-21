@@ -89,10 +89,10 @@ public class TADCandidato {
 	}
 
 	public void setGrauInteresseDesejado(int grau) {
-		if (grau >= 0) {
+		if (grau >= 0 || grau > 15) {
 			this.grauInteresseDesejado = grau;
 		} else {
-			throw new IllegalArgumentException("O grau de interesse desejado está abaixo de 0");
+			throw new IllegalArgumentException("Grau de interesse inválido, valor fora do intervalo de 0 a 15");
 		}
 	}
 
@@ -199,5 +199,73 @@ public class TADCandidato {
 			u = u.prox;
 		}
 	}
+	
+	public TADListaIdentificadores possuemMaisCompanheiros(int k) {
+		if (k < 1) {
+			throw new IllegalArgumentException("K deve ser pelo menos 1");
+		}
 
+		TADListaIdentificadores resultado = new TADListaIdentificadores();
+
+		for (int i = 0; i < k; i++) {
+			Candidato melhor = null;
+			Candidato aux = head.prox;
+
+			while (aux != null) {
+				// só considera quem ainda não foi escolhido
+				if (!resultado.contem(aux.getId())) {
+					if (melhor == null || numeroCompanheiros(aux) > numeroCompanheiros(melhor)) {
+						melhor = aux;
+					}
+				}
+				aux = aux.prox;
+			}
+
+			if (melhor == null) {
+				break; // K maior que o total de candidatos
+			}
+
+			resultado.add(melhor.getId());
+		}
+
+		return resultado;
+	}
+	
+	public String getNome(long id) {
+		Candidato c = buscarPorId(id);
+		if (c == null) {
+			throw new IllegalArgumentException("Candidato inexistente");
+		}
+		return c.nome;
+	}
+
+	public int numeroCompanheiros(int id) {
+		return numeroCompanheiros(buscarPorId(id));
+	}
+
+	public TADListaIdentificadores listaCompanheiros(long id) {
+		Candidato c = buscarPorId(id);
+
+		if (c == null) {
+			throw new IllegalArgumentException("Candidato inexistente");
+		}
+
+		return c.listaIds;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("[ \n");
+		Candidato atual = head.prox;
+
+		while (atual != null) {
+			sb.append(atual.id);
+			sb.append(" - ");
+			sb.append(atual.nome);
+			sb.append("\n");
+			atual = atual.prox;
+		}
+		sb.append("]");
+		return sb.toString();
+	}
 }
