@@ -5,6 +5,7 @@ public class TADListaInteresses {
 
     private Celula head;
     private Celula tail;
+    private int size;
 
     private class Celula {
         private int id;
@@ -21,7 +22,7 @@ public class TADListaInteresses {
     }
 
     public TADListaInteresses() {
-        head = new Celula(-1);
+        head = new Celula(0);
         tail = head;
     }
 
@@ -29,6 +30,9 @@ public class TADListaInteresses {
         if (id >= 1 && id <= 8 && !contem(id)) {
             tail.prox = new Celula(id);
             tail = tail.prox;
+            size++;
+        } else {
+        	throw new IllegalArgumentException();
         }
     }
 
@@ -46,15 +50,7 @@ public class TADListaInteresses {
     }
 
     public int getTamanho() {
-        int contador = 0;
-        Celula aux = head.prox;
-
-        while (aux != null) {
-            contador++;
-            aux = aux.prox;
-        }
-
-        return contador;
+        return size;
     }
 
     public int somaPesosComuns(TADListaInteresses outra) {

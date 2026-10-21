@@ -3,19 +3,20 @@ package TrabalhoCandidato;
 public class TADListaIdentificadores {
 	private Celula head;
 	private Celula tail;
+	private int size;
 	
 	public class Celula {
-		int id;
+		long id;
 		Celula prox;
 		
-		public Celula(int id) {
+		public Celula(long id) {
 			this.id = id;
 			this.prox = null;
 			
 			
 		}
 		
-		public int getId() {
+		public long getId() {
 			return id;
 		}
 	}
@@ -26,14 +27,15 @@ public class TADListaIdentificadores {
 		this.tail = head;
 	}
 	
-	public void add(int id) {
-		if(id >= 1 && !contem(id)) {
+	public void add(long id) {
+		if(id >= 0 && !contem(id)) {
 			tail.prox = new Celula(id);
 			tail = tail.prox;
+			size++;
 		}
 	}
 	
-	public boolean contem(int id) {
+	public boolean contem(long id) {
         Celula aux = head.prox;
 
         while (aux != null) {
@@ -47,13 +49,7 @@ public class TADListaIdentificadores {
     }
 	
 	public int getTamanho() {
-		int contador = 0;
-		Celula aux = this.head.prox;
-		while(aux != null) {
-			contador++;
-			aux = aux.prox;
-		}
-		return contador;
+		return size;
 	}
 	
 	public Celula getPrimeiro() {

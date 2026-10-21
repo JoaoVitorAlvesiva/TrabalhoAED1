@@ -1,99 +1,97 @@
 package TrabalhoCandidato;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import TrabalhoCandidato.Excecoes.ArquivoInvalidoException;
 
 public class LeitorArquivo {
 
 	public static void carregarCandidatos(String caminhoArquivo, TADCandidato sistema) {
 
 		if (sistema == null) {
-			// voltar exceção: sistema de candidatos nulo
-			return;
+			throw new NullPointerException("Lista de candidatos nula");
 		}
 
-		File arquivo = new File(caminhoArquivo);
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(caminhoArquivo), "UTF-8"))) {
 
-		try (Scanner scanner = new Scanner(arquivo)) {
+			String linha = proximaLinha(br);
 
-			if (!scanner.hasNextInt()) {
-				// voltar exceção: número de candidatos inválido
-				return;
+			if (linha == null) {
+				throw new ArquivoInvalidoException("Número de candidatos ausente");
 			}
 
-			int totalCandidatos = scanner.nextInt();
+			int totalCandidatos = Integer.parseInt(linha);
 
 			if (totalCandidatos < 0) {
-				// voltar exceção: número de candidatos negativo
-				return;
+				throw new ArquivoInvalidoException("Número inválido de candidatos (valor negativo)");
 			}
 
 			for (int i = 0; i < totalCandidatos; i++) {
+				linha = proximaLinha(br);
 
-				if (scanner.hasNext("\\*\\*\\*\\*")) {
-					scanner.next();
+				// pula o separador "****" que vem antes de cada candidato
+				if (linha != null && linha.startsWith("****")) {
+					linha = proximaLinha(br);
 				}
 
-				if (!scanner.hasNext()) {
-					// voltar exceção: nome do candidato ausente
-					return;
+				if (linha == null) {
+					throw new ArquivoInvalidoException("Nome do candidato ausente");
 				}
-				String nome = scanner.next();
+				
+				String nome = linha;
 
-				if (!scanner.hasNext()) {
-					// voltar exceção: estado do candidato ausente
-					return;
+				String estado = proximaLinha(br);
+				if (estado == null) {
+					throw new ArquivoInvalidoException("Estado do candidato ausente");
 				}
-				String estado = scanner.next();
 
-				if (!scanner.hasNext()) {
-					// voltar exceção: sexo do candidato ausente
-					return;
+				String sexoStr = proximaLinha(br);
+				if (sexoStr == null) {
+					throw new ArquivoInvalidoException("Sexo do candidato ausente");
 				}
-				String sexoStr = scanner.next();
 
-				if (!scanner.hasNext()) {
-					// voltar exceção: sexo de interesse ausente
-					return;
+				String sexoInteresseStr = proximaLinha(br);
+				if (sexoInteresseStr == null) {
+					throw new ArquivoInvalidoException("Sexo de interesse ausente");
 				}
-				String sexoInteresseStr = scanner.next();
 
 				SexoCandidato sexo = converterSexo(sexoStr);
 				SexoCandidato sexoInteresse = converterSexo(sexoInteresseStr);
 
-				if (sexo == null || sexoInteresse == null) {
-					// voltar exceção: sexo ou sexo de interesse inválido
-					return;
+				// o sexo do candidato é só F ou M; "I" vale apenas para o sexo de interesse
+				if (sexo == null || sexo == SexoCandidato.Indiferente || sexoInteresse == null) {
+					throw new ArquivoInvalidoException("Sexo ou sexo de interesse inválido");
 				}
 
-				if (!scanner.hasNextInt()) {
-					// voltar exceção: quantidade de áreas inválida
-					return;
+				String qtdStr = proximaLinha(br);
+				if (qtdStr == null) {
+					throw new ArquivoInvalidoException("Quantidade de áreas de interesse ausente");
 				}
 
-				int qtdAreas = scanner.nextInt();
+				int qtdAreas = Integer.parseInt(qtdStr);
 
 				if (qtdAreas < 0) {
-					// voltar exceção: quantidade de áreas negativa
-					return;
+					throw new ArquivoInvalidoException("Quantidade de áreas de interesse inválida (valor negativo)");
 				}
 
-				int idCandidato = sistema.add(nome, estado, sexo, sexoInteresse);
+				long idCandidato = sistema.add(nome, estado, sexo, sexoInteresse);
 
 				for (int j = 0; j < qtdAreas; j++) {
 
-					if (!scanner.hasNextInt()) {
-						// voltar exceção: área de interesse inválida
-						return;
+					String areaStr = proximaLinha(br);
+					if (areaStr == null) {
+						throw new ArquivoInvalidoException("Área de interesse ausente");
 					}
 
-					int area = scanner.nextInt();
+					int area = Integer.parseInt(areaStr);
 
 					if (area < 1 || area > 8) {
-						// voltar exceção: área de interesse fora do intervalo de 1 a 8
-						return;
+						throw new ArquivoInvalidoException("Área de interesse fora do intervalo de 1 a 8");
 					}
 
 					sistema.adicionaInteresse(idCandidato, area);
@@ -104,13 +102,33 @@ public class LeitorArquivo {
 
 		} catch (FileNotFoundException e) {
 			// voltar exceção: arquivo não encontrado
+			e.getMessage();
 
-		} catch (InputMismatchException e) {
-			// voltar exceção: formato dos dados incompatível com o esperado
+		} catch (IOException e) {
+			// voltar exceção: erro de leitura do arquivo
+			e.getMessage();
 
 		} catch (IllegalArgumentException | NullPointerException e) {
-			// voltar exceção: dados inválidos ao cadastrar candidato
+			// voltar exceção: número em formato inválido (NumberFormatException) ou
+			// dados inválidos ao cadastrar candidato
+			e.getMessage();
 		}
+	}
+
+	// devolve a próxima linha não vazia (sem espaços nas pontas) ou null se o
+	// arquivo acabou
+	private static String proximaLinha(BufferedReader br) throws IOException {
+		String linha = br.readLine();
+
+		while (linha != null && linha.trim().isEmpty()) {
+			linha = br.readLine();
+		}
+
+		if (linha == null) {
+			return null;
+		}
+
+		return linha.trim();
 	}
 
 	private static SexoCandidato converterSexo(String sigla) {

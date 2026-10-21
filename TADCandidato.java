@@ -4,12 +4,12 @@ public class TADCandidato {
 	private Candidato head;
 	private Candidato tail;
 
-	private static int proximoId = 0;
+	private long proximoId;
 
 	private int grauInteresseDesejado;
 
 	private class Candidato {
-		private int id;
+		private long id;
 		String nome;
 		String estado;
 		SexoCandidato sexo;
@@ -28,7 +28,7 @@ public class TADCandidato {
 			interesses = new TADListaInteresses();
 		}
 
-		public int getId() {
+		public long getId() {
 			return id;
 		}
 
@@ -36,10 +36,12 @@ public class TADCandidato {
 
 	public TADCandidato() {
 		head = new Candidato(null, null, null, null);
+		head.id = -1;
+		proximoId--;
 		tail = head;
 	}
 
-	public int add(String nome, String estado, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
+	public long add(String nome, String estado, SexoCandidato sexo, SexoCandidato sexoPotencialC) {
 		if (nome != null && !nome.trim().isEmpty() && estado != null && estado.trim().matches("[A-Za-z]{2}")
 				&& sexo != null && sexoPotencialC != null) {
 			tail.prox = new Candidato(nome, estado.trim().toUpperCase(), sexo, sexoPotencialC);
@@ -47,14 +49,16 @@ public class TADCandidato {
 
 			return tail.getId();
 		} else {
-			throw new NullPointerException();
+			throw new IllegalArgumentException();
 		}
 	}
 
 	public void inserePotencialCompanheiro(Candidato c1, Candidato c2) {
+		if(c1 == null || c2 == null) {
+			throw new NullPointerException("Candidato nulo");
+		}
 
-		if (c1 != null && c2 != null && verificaPotencialCompanheiro(c1, c2) && !c1.listaIds.contem(c2.getId())) {
-
+		if (verificaPotencialCompanheiro(c1, c2) && !c1.listaIds.contem(c2.getId())) {
 			c1.listaIds.add(c2.getId());
 		}
 	}
@@ -71,7 +75,7 @@ public class TADCandidato {
 		if (c != null && id >= 1) {
 			return c.listaIds.verificarId(id);
 		} else {
-			throw new NullPointerException();
+			throw new IllegalArgumentException();
 		}
 	}
 
@@ -87,6 +91,8 @@ public class TADCandidato {
 	public void setGrauInteresseDesejado(int grau) {
 		if (grau >= 0) {
 			this.grauInteresseDesejado = grau;
+		} else {
+			throw new IllegalArgumentException("O grau de interesse desejado está abaixo de 0");
 		}
 	}
 
@@ -104,23 +110,18 @@ public class TADCandidato {
 			throw new NullPointerException();
 		}
 
-		if (!reside(c1, c2.estado)) {
-			return false;
-		}
-
 		// verificar isso, pois não sei se para estar na lista de potencial companheiro,
-		// precisa
-		// considerar o sexo de interesse dos dois ou somente o do candidato c1
-		if (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo)) {
+		// precisa considerar o sexo de interesse dos dois ou somente o do candidato c1
+		if (!reside(c1, c2.estado) || (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo))) {
 			return false;
 		}
-
+		
 		int grauComum = c1.interesses.somaPesosComuns(c2.interesses);
 
 		return grauComum >= grauInteresseDesejado;
 	}
 
-	private Candidato buscarPorId(int id) {
+	private Candidato buscarPorId(long id) {
 		Candidato aux = head.prox;
 
 		while (aux != null) {
@@ -134,7 +135,7 @@ public class TADCandidato {
 		return null;
 	}
 
-	public boolean adicionaInteresse(int idCandidato, int area) {
+	public boolean adicionaInteresse(long idCandidato, int area) {
 		Candidato c = buscarPorId(idCandidato);
 
 		if (c == null || area < 1 || area > 8) {
@@ -149,7 +150,7 @@ public class TADCandidato {
 		return true;
 	}
 
-	public boolean possuiAreaInteresse(int idCandidato, int area) {
+	public boolean possuiAreaInteresse(long idCandidato, int area) {
 		Candidato c = buscarPorId(idCandidato);
 
 		return c != null && c.interesses.contem(area);
@@ -171,7 +172,7 @@ public class TADCandidato {
 		if (c != null) {
 			return c.listaIds;
 		} else {
-			return null;
+			throw new NullPointerException("Candidato nulo");
 		}
 
 	}

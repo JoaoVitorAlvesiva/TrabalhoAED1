@@ -5,19 +5,19 @@ public class Main {
 		TADCandidato candidatos = new TADCandidato();
 		
 		// 1. Inserindo os candidatos
-        int idAna = candidatos.add(
+        long idAna = candidatos.add(
             "Ana", "MG",
             SexoCandidato.Feminino,
             SexoCandidato.Masculino
         );
 
-        int idJoao = candidatos.add(
+        long idJoao = candidatos.add(
             "Joao", "MG",
             SexoCandidato.Masculino,
             SexoCandidato.Feminino
         );
 
-        int idMaria = candidatos.add(
+        long idMaria = candidatos.add(
             "Maria", "SP",
             SexoCandidato.Feminino,
             SexoCandidato.Indiferente
