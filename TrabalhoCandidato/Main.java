@@ -7,6 +7,9 @@ import TrabalhoCandidato.Excecoes.ArquivoInvalidoException;
 
 public class Main {
 	private static Scanner scan = new Scanner(System.in);
+	private static String[] areas = { "", "ESPORTES", "ARTES", "MÚSICA", "CINEMA",
+			"TECNOLOGIA", "ANIMAIS", "GASTRONOMIA", "CIÊNCIAS" };
+	private static String[] estados = {"MG", "SP", "RJ", "ES" };
 
 	public static void main(String[] args) {
 		TADCandidato candidatos = new TADCandidato();
@@ -17,6 +20,8 @@ public class Main {
 			return;
 		}
 
+		candidatos.processarTodosPares();
+		
 		int opcao = -1;
 		// início da interatividade com o usuário
 		do {
@@ -61,11 +66,15 @@ public class Main {
 					break;
 				}
 				case 5: {
-
+					imprimirAreas();
+					System.out.println("Informe o código da área de interesse: ");
+					candidatosComInteresse(candidatos, scan.nextInt());
 					break;
 				}
 				case 6: {
-
+					imprimirEstados();
+					System.out.println("Informe a sigla do estado que deseja: ");
+					candidatosQueResidem(candidatos, scan.next());
 					break;
 				}
 				default:
@@ -110,5 +119,39 @@ public class Main {
 
 		System.out.println("-- CANDIDATOS SEM COMPANHEIROS ENCONTRADOS --");
 		System.out.println(candidatos.formataLista(cands));
+	}
+	
+	public static void imprimirAreas() {
+		System.out.println("-- ÁREAS DE INTERESSE --");
+		for (int i = 1; i < areas.length; i++) {
+			System.out.println(i + " - " + areas[i]);
+		}
+	}
+	
+	public static void candidatosComInteresse(TADCandidato candidatos, int area) {
+		TADListaIdentificadores cands = candidatos.candidatosComInteresse(area);
+
+		System.out.println("-- CANDIDATOS COM INTERESSE EM " + area + " - " + areas[area] + " --");
+
+		System.out.println(candidatos.formataLista(cands));
+
+		System.out.println("Total: " + cands.getTamanho());
+	}
+	
+	public static void imprimirEstados() {
+		System.out.println("-- ESTADOS DISPONÍVEIS --");
+		for (int i = 0; i < estados.length; i++) {
+			System.out.println(estados[i]);
+		}
+	}
+	
+	public static void candidatosQueResidem(TADCandidato candidatos, String sigla) {
+		TADListaIdentificadores cands = candidatos.candidatosQueResidem(sigla, estados);
+
+		System.out.println("-- CANDIDATOS QUE MORAM EM " + sigla.toUpperCase() + " --");
+
+		System.out.println(candidatos.formataLista(cands));
+
+		System.out.println("Total: " + cands.getTamanho());
 	}
 }

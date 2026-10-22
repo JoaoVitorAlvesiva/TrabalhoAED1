@@ -58,7 +58,7 @@ public class TADCandidato {
 			throw new NullPointerException("Candidato nulo");
 		}
 
-		if (verificaPotencialCompanheiro(c1, c2) && !c1.listaIds.contem(c2.getId())) {
+		if (!c1.listaIds.contem(c2.getId())) {
 			c1.listaIds.add(c2.getId());
 		}
 	}
@@ -72,7 +72,7 @@ public class TADCandidato {
 	}
 
 	public boolean temInteresse(Candidato c, int id) {
-		if (c != null && id >= 1) {
+		if (c != null && id >= 0) {
 			return c.listaIds.verificarId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -105,15 +105,11 @@ public class TADCandidato {
 	}
 
 	public boolean verificaPotencialCompanheiro(Candidato c1, Candidato c2) {
-
 		if (c1 == null || c2 == null || c1 == c2) {
-			throw new NullPointerException();
+			throw new IllegalArgumentException();
 		}
-
-		// verificar isso, pois não sei se para estar na lista de potencial companheiro,
-		// precisa considerar o sexo de interesse dos dois ou somente o do candidato c1
-		if (!reside(c1, c2.estado)
-				|| (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo))) {
+		
+		if (!reside(c1, c2.estado) || (!aceitaSexo(c1.sexoPotencialC, c2.sexo))) {
 			return false;
 		}
 
@@ -155,18 +151,6 @@ public class TADCandidato {
 		Candidato c = buscarPorId(idCandidato);
 
 		return c != null && c.interesses.contem(area);
-	}
-
-	// alterar depois, criado para fazer testes
-	public void imprimirCandidatos() {
-		Candidato aux = head.prox;
-
-		while (aux != null) {
-			System.out.println("ID: " + aux.getId() + " | Nome: " + aux.nome + " | Estado: " + aux.estado + " | Sexo: "
-					+ aux.sexo);
-
-			aux = aux.prox;
-		}
 	}
 
 	public TADListaIdentificadores listaCompanheiros(Candidato c) {
@@ -239,7 +223,7 @@ public class TADCandidato {
 		}
 		return c.nome;
 	}
-	
+
 	public String getEstado(long id) {
 		Candidato c = buscarPorId(id);
 		if (c == null) {
@@ -274,6 +258,53 @@ public class TADCandidato {
 		}
 
 		return resultado;
+	}
+
+	public TADListaIdentificadores candidatosComInteresse(int area) {
+		if (area < 1 || area > 8) {
+			throw new IllegalArgumentException("Área inválida, digite um valor de 1 a 8");
+		}
+
+		TADListaIdentificadores resultado = new TADListaIdentificadores();
+
+		Candidato atual = head.prox;
+		while (atual != null) {
+			if (possuiAreaInteresse(atual.getId(), area)) {
+				resultado.add(atual.getId());
+			}
+			atual = atual.prox;
+		}
+
+		return resultado;
+	}
+
+	public TADListaIdentificadores candidatosQueResidem(String sigla, String[] estados) {
+		if (!verificarEstadoExistente(sigla, estados)) {
+			throw new IllegalArgumentException("Estado inválido");
+		}
+
+		TADListaIdentificadores resultado = new TADListaIdentificadores();
+
+		Candidato atual = head.prox;
+		while (atual != null) {
+			if (reside(atual, sigla)) {
+				resultado.add(atual.getId());
+			}
+			atual = atual.prox;
+		}
+
+		return resultado;
+	}
+
+	public boolean verificarEstadoExistente(String sigla, String[] estados) {
+		if (sigla == null || !sigla.trim().matches("[A-Za-z]{2}") || estados == null) {
+			throw new IllegalArgumentException("Dados inválidos");
+		}
+		for (int i = 0; i < estados.length; i++) {
+			if (sigla.equalsIgnoreCase(estados[i]))
+				return true;
+		}
+		return false;
 	}
 
 	public String formataLista(TADListaIdentificadores companheiros) {

@@ -1,8 +1,9 @@
 package TrabalhoCandidato;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Random;
 
@@ -20,7 +21,7 @@ public class GeradorCandidatos {
 		String[] nomes = new String[1000];
 		String[] sexosDosNomes = new String[1000];
 		int qtdNomes = 0;
-		BufferedReader br = new BufferedReader(new FileReader("nomes.txt"));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("nomes.txt"), "UTF-8"));
 		String linha = br.readLine();
 		while (linha != null && qtdNomes < nomes.length) {
 			if (!linha.trim().isEmpty()) {
@@ -37,7 +38,7 @@ public class GeradorCandidatos {
 		String[] sexosInteresse = { "F", "M", "I" };
 		Random random = new Random();
 
-		PrintWriter pw = new PrintWriter("candidatos.txt");
+		PrintWriter pw = new PrintWriter("candidatos.txt", "UTF-8");
 		pw.println(n);
 
 		for (int i = 0; i < n; i++) {

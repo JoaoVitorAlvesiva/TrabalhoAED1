@@ -12,8 +12,6 @@ public class TADListaIdentificadores {
 		public Celula(long id) {
 			this.id = id;
 			this.prox = null;
-			
-			
 		}
 		
 		public long getId() {

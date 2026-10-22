@@ -107,7 +107,6 @@ public class LeitorArquivo {
 			throw new ArquivoInvalidoException("erro de leitura do arquivo");
 
 		} catch (IllegalArgumentException | NullPointerException e) {
-			e.getMessage();
 			throw new ArquivoInvalidoException("número em formato inválido (NumberFormatException) ou dados inválidos ao cadastrar candidato");
 		}
 	}
