@@ -1,17 +1,26 @@
 package TrabalhoCandidato;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
+
+import TrabalhoCandidato.Excecoes.ArquivoInvalidoException;
 
 public class Main {
 	private static Scanner scan = new Scanner(System.in);
 
 	public static void main(String[] args) {
 		TADCandidato candidatos = new TADCandidato();
-		LeitorArquivo.carregarCandidatos("candidatos.txt", candidatos);
+		try {
+			LeitorArquivo.carregarCandidatos("candidatos.txt", candidatos);
+		} catch (ArquivoInvalidoException e) {
+			System.err.println("Erro ao carregar o arquivo: " + e.getMessage());
+			return;
+		}
 
-		int opcao;
+		int opcao = -1;
 		// início da interatividade com o usuário
 		do {
+			System.out.println("\n-- MENU --");
 			System.out.println("O que deseja fazer?");
 			System.out.println("| 1 - Inserir/atualizar o grau de interesse desejado");
 			System.out.println("| 2 - Imprimir a lista dos potenciais companheiros de um candidato");
@@ -20,64 +29,86 @@ public class Main {
 			System.out.println("| 5 - Imprimir id/nome de candidatos com interesse em uma determinada área");
 			System.out.println("| 6 - Imprimir id/nome de candidatos que residem em um determinado estado");
 			System.out.println("| 0 - Sair do programa");
-			opcao = scan.nextInt();
 
-			switch (opcao) {
-			case 0: {
-				System.out.println("Programa encerrado!");
-				break;
-			}
-			case 1: {
-				inserirGrauInteresse(candidatos);
-				candidatos.processarTodosPares();
-				break;
-			}
-			case 2: {
-				System.out.println("Informe o id de qual dos candidatos abaixo você deseja saber os potenciais companheiros: ");
-				System.out.println(candidatos);
-				imprimirPotenciaisCompanheiros(candidatos, scan.nextInt());
-				break;
-			}
-			case 3: {
+			try {
+				opcao = scan.nextInt();
 
-				break;
-			}
-			case 4: {
+				switch (opcao) {
+				case 0: {
+					System.out.println("Programa encerrado!");
+					break;
+				}
+				case 1: {
+					inserirGrauInteresse(candidatos);
+					candidatos.processarTodosPares();
+					break;
+				}
+				case 2: {
+					System.out.println(candidatos);
+					System.out.println(
+							"Informe o id de qual dos candidatos acima você deseja saber os potenciais companheiros: ");
+					imprimirPotenciaisCompanheiros(candidatos, scan.nextInt());
+					break;
+				}
+				case 3: {
+					System.out.println(
+							"Informe a quantidade de candidatos que você deseja saber que tem o maior número de potenciais companheiros: ");
+					possuemMaisCompanheiros(candidatos, scan.nextInt());
+					break;
+				}
+				case 4: {
+					naoPossuiCompanheiros(candidatos);
+					break;
+				}
+				case 5: {
 
-				break;
-			}
-			case 5: {
+					break;
+				}
+				case 6: {
 
-				break;
+					break;
+				}
+				default:
+					System.out.println("Opção inválida, valor fora do intervalo de 0 a 6");
+					break;
+				}
+			} catch (IllegalArgumentException | NullPointerException e) {
+				System.err.println(e.getMessage());
+			} catch (InputMismatchException e) {
+				System.out.println("Digite um número inteiro.");
+				scan.nextLine(); // descarta o texto digitado
+				opcao = -1;
 			}
-			case 6: {
-
-				break;
-			}
-			default:
-				System.out.println("Opção inválida, valor fora do intervalo de 0 a 6");
-			}
-		} while(opcao != 0);
+		} while (opcao != 0);
 	}
 
 	public static void inserirGrauInteresse(TADCandidato candidatos) {
 		System.out.println("Qual o grau de interesse desejado?");
 		int grauInteresse = scan.nextInt();
 		candidatos.setGrauInteresseDesejado(grauInteresse);
+		System.out.println("Grau de interesse desejado atual: " + candidatos.getGrauInteresseDesejado());
 	}
-	
+
 	public static void imprimirPotenciaisCompanheiros(TADCandidato candidatos, int idCand) {
 		TADListaIdentificadores lista = candidatos.listaCompanheiros(idCand);
 
-		System.out.println("Candidato: " + idCand + " - " + candidatos.getNome(idCand));
+		System.out.println("Candidato: " + idCand + " - " + candidatos.getNome(idCand) + " - " + candidatos.getEstado(idCand));
 		System.out.println("Número de potenciais companheiros: " + lista.getTamanho());
 
-		TADListaIdentificadores.Celula c = lista.getPrimeiro();
+		System.out.println(candidatos.formataLista(lista));
+	}
 
-		while (c != null) {
-			long id = c.getId();
-			System.out.println(id + " - " + candidatos.getNome(id));
-			c = c.prox;
-		}
+	public static void possuemMaisCompanheiros(TADCandidato candidatos, int k) {
+		TADListaIdentificadores cands = candidatos.possuemMaisCompanheiros(k);
+
+		System.out.println("-- CANDIDATOS COM MAIS COMPANHEIROS --");
+		System.out.println(candidatos.formataLista(cands));
+	}
+
+	public static void naoPossuiCompanheiros(TADCandidato candidatos) {
+		TADListaIdentificadores cands = candidatos.naoPossuiCompanheiros();
+
+		System.out.println("-- CANDIDATOS SEM COMPANHEIROS ENCONTRADOS --");
+		System.out.println(candidatos.formataLista(cands));
 	}
 }

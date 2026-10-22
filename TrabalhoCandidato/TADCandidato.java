@@ -54,7 +54,7 @@ public class TADCandidato {
 	}
 
 	public void inserePotencialCompanheiro(Candidato c1, Candidato c2) {
-		if(c1 == null || c2 == null) {
+		if (c1 == null || c2 == null) {
 			throw new NullPointerException("Candidato nulo");
 		}
 
@@ -89,7 +89,7 @@ public class TADCandidato {
 	}
 
 	public void setGrauInteresseDesejado(int grau) {
-		if (grau >= 0 || grau > 15) {
+		if (grau >= 0 && grau <= 15) {
 			this.grauInteresseDesejado = grau;
 		} else {
 			throw new IllegalArgumentException("Grau de interesse inválido, valor fora do intervalo de 0 a 15");
@@ -112,10 +112,11 @@ public class TADCandidato {
 
 		// verificar isso, pois não sei se para estar na lista de potencial companheiro,
 		// precisa considerar o sexo de interesse dos dois ou somente o do candidato c1
-		if (!reside(c1, c2.estado) || (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo))) {
+		if (!reside(c1, c2.estado)
+				|| (!aceitaSexo(c1.sexoPotencialC, c2.sexo) || !aceitaSexo(c2.sexoPotencialC, c1.sexo))) {
 			return false;
 		}
-		
+
 		int grauComum = c1.interesses.somaPesosComuns(c2.interesses);
 
 		return grauComum >= grauInteresseDesejado;
@@ -199,10 +200,10 @@ public class TADCandidato {
 			u = u.prox;
 		}
 	}
-	
+
 	public TADListaIdentificadores possuemMaisCompanheiros(int k) {
-		if (k < 1) {
-			throw new IllegalArgumentException("K deve ser pelo menos 1");
+		if (k < 1 || k > proximoId) {
+			throw new IllegalArgumentException("K deve estar entre 1 e a quantidade de candidatos");
 		}
 
 		TADListaIdentificadores resultado = new TADListaIdentificadores();
@@ -230,13 +231,21 @@ public class TADCandidato {
 
 		return resultado;
 	}
-	
+
 	public String getNome(long id) {
 		Candidato c = buscarPorId(id);
 		if (c == null) {
 			throw new IllegalArgumentException("Candidato inexistente");
 		}
 		return c.nome;
+	}
+	
+	public String getEstado(long id) {
+		Candidato c = buscarPorId(id);
+		if (c == null) {
+			throw new IllegalArgumentException("Candidato inexistente");
+		}
+		return c.estado;
 	}
 
 	public int numeroCompanheiros(int id) {
@@ -252,7 +261,48 @@ public class TADCandidato {
 
 		return c.listaIds;
 	}
-	
+
+	public TADListaIdentificadores naoPossuiCompanheiros() {
+
+		TADListaIdentificadores resultado = new TADListaIdentificadores();
+
+		Candidato atual = head.prox;
+		while (atual != null) {
+			if (numeroCompanheiros(atual) == 0)
+				resultado.add(atual.getId());
+			atual = atual.prox;
+		}
+
+		return resultado;
+	}
+
+	public String formataLista(TADListaIdentificadores companheiros) {
+		if (companheiros == null) {
+			throw new NullPointerException("Lista de identificadores nula");
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		TADListaIdentificadores.Celula celula = companheiros.getPrimeiro();
+
+		while (celula != null) {
+			Candidato atual = buscarPorId(celula.getId());
+
+			if (atual != null) {
+				sb.append("[ ");
+				sb.append(atual.id);
+				sb.append(" - ");
+				sb.append(atual.nome);
+				sb.append(" - Número de potenciais companheiros: ");
+				sb.append(atual.listaIds.getTamanho());
+				sb.append(" ]\n");
+			}
+
+			celula = celula.prox;
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[ \n");
@@ -262,6 +312,8 @@ public class TADCandidato {
 			sb.append(atual.id);
 			sb.append(" - ");
 			sb.append(atual.nome);
+			sb.append(" - ");
+			sb.append(atual.estado);
 			sb.append("\n");
 			atual = atual.prox;
 		}
