@@ -1,0 +1,201 @@
+=====================================================================
+ AGÊNCIA DE RELACIONAMENTO
+ CEFET-MG - Campus Timoteo | Lab. AED I | Prof. Luciano Moreira
+ Trabalho 1
+ Alunos: Isabella Senra Menezes e João Vitor Alves Silva
+=====================================================================
+ 
+1. O QUE É O PROGRAMA
+---------------------
+Ferramenta de linha de comando que lê o cadastro de candidatos de uma
+agência de relacionamento e identifica os potenciais companheiros de
+cada um, considerando:
+  - mesmo estado;
+  - preferência de sexo do candidato;
+  - grau de interesse em comum (soma dos pesos das áreas em comum)
+    maior ou igual ao grau desejado, definido pelo usuário.
+
+Pesos das áreas:
+  1 ESPORTES     = 1      5 TECNOLOGIA  = 3
+  2 ARTES        = 2      6 ANIMAIS     = 2
+  3 MUSICA       = 1      7 GASTRONOMIA = 2
+  4 CINEMA       = 1      8 CIENCIAS    = 3
+ 
+ 
+2. REQUISITOS
+-------------
+  - Terminal com suporte a UTF-8 (para exibir acentos corretamente).
+
+ 
+3. ESTRUTURA DE ARQUIVOS
+------------------------
+Os arquivos-fonte ficam na pasta "TrabalhoCandidato" (nome do pacote):
+ 
+  src/
+    TrabalhoCandidato/
+      Main.java
+      LeitorArquivo.java
+      GeradorCandidatos.java
+      TADCandidato.java
+      TADListaIdentificadores.java
+      TADListaInteresses.java
+      SexoCandidato.java
+      Excecoes/
+        ArquivoInvalidoException.java
+  nomes.txt
+  candidatos.txt
+ 
+Arquivos de dados (devem estar na pasta de onde o programa e executado (na mesma pasta onde está src)):
+  nomes.txt       - dicionario de nomes usado pelo gerador
+  candidatos.txt  - cadastro lido pelo programa principal
+ 
+ 
+4. GERANDO O ARQUIVO DE CANDIDATOS (programa auxiliar)
+------------------------------------------------------
+O GeradorCandidatos cria o arquivo candidatos.txt com dados aleatórios.
+ 
+5.1 Prepare o arquivo nomes.txt na pasta de execução, um nome por linha
+    no formato "Nome;Sexo", onde Sexo é F ou M. Exemplo:
+ 
+      Ana Souza;F
+      Joao Pereira;M
+      Maria Oliveira;F
+      Carlos Lima;M
+ 
+    (Salve o arquivo em UTF-8. Todas as linhas devem ter o ";".)
+ 
+5.2 Sobre a execução:
+    Cada execução sobrescreve o candidatos.txt existente.
+    Estados sorteados: MG, SP, RJ, ES.
+  Obs: Se desejar acrescentar mais estados no sorteio, acrescente também no vetor de String de estados que contém no arquivo Main
+
+ 
+6. FORMATO DO ARQUIVO candidatos.txt
+------------------------------------
+  N                      (número de candidatos)
+  ****
+  nome
+  sigla_estado           (2 letras, ex.: MG)
+  sexo                   (F ou M)
+  sexo_interesse         (F, M ou I = indiferente)
+  numero_areas
+  area_1                 (código de 1 a 8)
+  area_2
+  ...
+  ****
+  (próximo candidato)
+ 
+Exemplo:
+ 
+  2
+  ****
+  Ana Souza
+  MG
+  F
+  M
+  2
+  1
+  5
+  ****
+  João Pereira
+  MG
+  M
+  F
+  1
+  5
+ 
+Linhas em branco são ignoradas. O arquivo deve estar em UTF-8.
+ 
+ 
+7. EXECUTANDO O PROGRAMA PRINCIPAL
+----------------------------------
+Com o candidatos.txt na pasta de execução (deve ficar na mesma pasta onde contém a pasta src):
+  Projeto/candidatos.txt 
+ 
+Ao iniciar, o programa carrega o arquivo e calcula os potenciais
+companheiros com grau de interesse desejado igual a 0. Se o arquivo
+estiver ausente ou malformado, uma mensagem de erro é exibida e o
+programa encerra.
+ 
+ 
+8. USO DO MENU
+--------------
+Digite o número da opção e pressione ENTER.
+ 
+  1 - Inserir/atualizar o grau de interesse desejado
+      Informe um inteiro de 0 a 15. Todas as listas de potenciais
+      companheiros são recalculadas com o novo grau.
+ 
+  2 - Imprimir a lista dos potenciais companheiros de um candidato
+      O programa mostra todos os candidatos (id - nome - estado).
+      Informe o id desejado. São impressos o número e a lista de
+      potenciais companheiros.
+ 
+  3 - Imprimir id/nome dos K candidatos com maior número de potenciais
+      companheiros
+      Informe K (entre 1 e o total de candidatos).
+ 
+  4 - Imprimir id/nome dos candidatos sem nenhum companheiro encontrado
+ 
+  5 - Imprimir id/nome de candidatos com interesse em uma área
+      Informe o código da área (1 a 8). Ao final e impresso o total.
+ 
+  6 - Imprimir id/nome de candidatos que residem em um estado
+      Informe a sigla (MG, SP, RJ ou ES; maiúsculas ou minúsculas).
+      Ao final e impresso o total.
+ 
+  0 - Sair do programa
+ 
+Entradas inválidas (texto no lugar de número, id inexistente, área ou
+estado inválido, grau fora de 0 a 15) geram uma mensagem de erro e o menu volta.
+ 
+ 
+9. EXEMPLO DE SESSAO
+--------------------
+  Candidatos carregados com sucesso do arquivo: candidatos.txt
+ 
+  -- MENU --
+  ...
+  1
+  Qual o grau de interesse desejado?
+  4
+  Grau de interesse desejado atual: 4
+ 
+  2
+  [ lista de candidatos ]
+  Informe o id de qual dos candidatos acima você deseja saber os
+  potenciais companheiros:
+  0
+  Candidato: 0 - Ana Souza - MG
+  Número de potenciais companheiros: 3
+  [ 7 - João Pereira - Número de potenciais companheiros: 5 ]
+  ...
+ 
+ 
+10. OBSERVAÇÕES SOBRE AS REGRAS
+-------------------------------
+  - Apenas a prefêrencia de sexo do candidato u é considerada ao decidir
+    se v é seu potencial companheiro (conforme o enunciado). Por isso a
+    relação não é simétrica: v pode estar na lista de u sem que u esteja
+    na lista de v.
+  - O sexo cadastrado do candidato deve ser F ou M. O valor I é válido
+    somente para o sexo de interesse.
+  - Os identificadores são gerados pelo programa, em sequência a partir
+    de 0, na ordem em que os candidatos aparecem no arquivo.
+  - A opção 6 aceita apenas os estados MG, SP, RJ e ES (a não ser que sejam acrescentadas mais opções no vetor de estados na Main).
+  - As estruturas de dados (listas encadeadas com tail e sentinela) foram
+    implementadas pelo grupo, sem uso de ArrayList, LinkedList e similares.
+ 
+ 
+11. PROBLEMAS COMUNS
+--------------------
+  - "Erro ao carregar o arquivo: arquivo não encontrado"
+      O candidatos.txt não está na pasta de onde o java foi executado.
+      Rode o gerador ou copie o arquivo para essa pasta.
+ 
+  - Acentos aparecendo errados
+      Confira se nomes.txt e candidatos.txt estão em UTF-8 e se o
+      terminal está configurado para UTF-8.
+ 
+  - Gerador falha com ArrayIndexOutOfBoundsException
+      Alguma linha de nomes.txt não tem o formato "Nome;Sexo".
