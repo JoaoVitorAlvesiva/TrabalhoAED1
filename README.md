@@ -197,10 +197,5 @@ estado invalido, grau fora de 0 a 15) geram uma mensagem e o menu volta.
       Confira se nomes.txt e candidatos.txt estao em UTF-8 e se o
       terminal esta configurado para UTF-8.
  
-  - "Could not find or load main class"
-      Execute a partir da pasta que contem o diretorio TrabalhoCandidato
-      (ou use -cp com a pasta de saida) e informe o nome completo da
-      classe, com o pacote: TrabalhoCandidato.Main.
- 
   - Gerador falha com ArrayIndexOutOfBoundsException
       Alguma linha de nomes.txt nao tem o formato "Nome;Sexo".
